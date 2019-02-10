@@ -1,0 +1,9 @@
+base
+dplyr
+ggplot2
+ggcorrplot
+plyr
+lattice
+caret
+corrplot
+rattle

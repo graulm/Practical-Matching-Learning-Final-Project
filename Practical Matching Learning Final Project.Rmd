@@ -2,7 +2,9 @@
 title: "Practical Matching Learning Final Project"
 author: "R. Martinez"
 date: "February 9, 2019"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -25,8 +27,13 @@ Test data: <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv>
    
 Follwoing, I will load the librries and load the data:     
 ```{r load_data, warning=FALSE, comment=FALSE, cache=TRUE}
-library(dplyr); library(ggplot2); library(ggcorrplot); library(plyr)
-library(caret); library(corrplot); library(rattle)
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+library(plyr)
+library(caret)
+library(corrplot)
+library(rattle)
 set.seed(201902)
 
 training = read.csv("./pml-training.csv")
