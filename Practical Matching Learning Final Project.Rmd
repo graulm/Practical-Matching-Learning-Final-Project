@@ -1,0 +1,132 @@
+---
+title: "Practical Matching Learning Final Project"
+author: "R. Martinez"
+date: "February 9, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+"Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it."  
+  
+In this project, **the goal is to predict whether participants are perfoming barbell lifts correctly.** To do that the model is built using data from accelerometers used by 6 individuals who were asked to perform barbell lifts correctly and incorrectly in 5 different ways.   
+
+For more information about this experiment: <http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har> (see the section on the Weight Lifting Exercise Dataset).
+
+## Preparing the Data
+  
+The data can be downloaded from following sites:  
+Training data: <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv>  
+Test data: <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv>  
+   
+Follwoing, I will load the librries and load the data:     
+```{r load_data, warning=FALSE, comment=FALSE, cache=TRUE}
+library(dplyr); library(ggplot2); library(ggcorrplot); library(plyr)
+library(caret); library(corrplot); library(rattle)
+set.seed(201902)
+
+training = read.csv("./pml-training.csv")
+testing  = read.csv("./pml-testing.csv")
+```
+  
+After exploring the data, it was found that some of the columns are mostly empty or have NA values.  
+Let's clean up the file here:  
+```{r clean_up, warning=FALSE, comment=FALSE, cache=TRUE}
+nzv <- nearZeroVar(training)
+new_training <- training[,-nzv]
+new_testing  <- testing[,-nzv]
+allna <- sapply(new_training, function(x) mean(is.na(x))) > 0.95
+new_training <- new_training[,allna==FALSE]
+new_testing  <- new_testing[,allna==FALSE]
+
+```
+  
+Also, let's remove the first six columns (X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, num_window) that don't add anything to the model:   
+```{r more_clean_up, warning=FALSE, cache=TRUE}
+new_training <- new_training[,-(1:6)]
+new_testing  <- new_testing[,-(1:6)]
+```
+   
+  
+## Building the Model
+  
+The objective is to build a model that can predict with the best accuracy possible. To do that, I'm going to build following models: Tree Model, Random Forest, Gradient Boosting, and compare them to determine which one provides the best predicton. Once the best predictor is found (based on Accuracy), I will use that model to predict the outcome for the "Test" file to answer the final 20 questions on the Cousera sites.  
+  
+Before building the models, let's create the training and test files (70%-30%):
+```{r trin_test_file, comment=FALSE, warning=FALSE, cache=FALSE}
+library(caret)
+inTrain <- createDataPartition(y=new_training$classe,p=0.7, list=FALSE)
+trainingSet <- new_training[inTrain,]
+testingSet  <- new_training[-inTrain,]
+```
+
+### Tree Model
+``` {r tree_model, warning=FALSE, cache=TRUE}
+modFit <- train(classe ~ .,method="rpart",data=trainingSet)
+ 
+predict_tree_Model <- predict(modFit,newdata=testingSet)
+confMatrix_tree <- confusionMatrix(predict_tree_Model,testingSet$classe)
+confMatrix_tree
+ 
+fancyRpartPlot(modFit$finalModel)
+```
+  
+  
+### Random Forest Model
+```{r rf, warning=FALSE, cache=TRUE}
+# Note: Here are forward I'm using a small size of the traianing file due computer-perfomance issue. 
+trainingSet_sample <- sample_n(trainingSet, size=1000)
+modFit_rf <- train(classe~ .,data=trainingSet_sample,method="rf",prox=TRUE, ntrees=50)
+
+predict_rf_Model <- predict(modFit_rf,newdata=testingSet)
+confMatrix_rf <- confusionMatrix(predict_rf_Model,testingSet$classe)
+confMatrix_rf
+```
+  
+  
+### Gradient Boosting Model  
+```{r gbm,  warning=FALSE, cache=TRUE}
+modFit_gbm <- train(classe ~ ., method="gbm",data=trainingSet_sample,verbose=FALSE)
+
+predict_gbm_Model <- predict(modFit_gbm,newdata=testingSet)
+confMatrix_gbm <- confusionMatrix(predict_gbm_Model,testingSet$classe)
+confMatrix_gbm
+```  
+     
+     
+### Compare the Accuracy of the Models  
+  
+Following are the Accuracy for each of the models built above.  
+I'm going to use the model with the highest Accuracy value:  
+  
+``` {r conf_matrix, warning=FALSE, comment=FALSE, results='asis' }
+models  <- c('Tree Model', 'Random Forest Model', 'Gradient Boosting Machine Model')
+values <- c(confMatrix_tree$overall[1], confMatrix_rf$overall[1], confMatrix_gbm$overall[1])
+compare_matrix <- rbind(models, values)
+knitr::kable(compare_matrix ,  caption = "Accuracy of Models")
+```
+  
+As the reader can observe, the best Accuracy is provided by the **Random Forest Model** which is slighly higher than the 'Boosting Machine Model' and much better than the 'Tree Model'. So, let's use that model for the prediction.  
+  
+Note that although the best Accuracy is ~91%, **it is expected that the accuracy won't be that high when predicting the outcome for the new data**. That's normal and expected that models' accuracy is lower when using real data. So, the model will fail to predict correctly some of outcomes for the 20 questions that are part of the final quiz; but based on the Accuracy and the Confusion Matrix shown above, the model seems to be good enough to reach at least 80% of the answers correctly which is the minimum required by Cousera's rules to pass the quiz.    
+
+  
+## Preditions
+  
+On this section, using the model with the best Accuracy **Random Forest Model**, I will predict whether the participants performed the activities correctly or incorrectly:  
+  
+``` {r mypredictions, warning=FALSE, comment=FALSE, eval=FALSE}
+
+final_predictions <- predict(modFit_rf,newdata=new_testing)
+final_predictions
+
+# NOTE: Predictions are not shown here to prevent from publishing the answers of the final quiz.
+```
+
+.  
+.  
+.  
