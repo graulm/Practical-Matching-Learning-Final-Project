@@ -18,62 +18,12 @@ Follwoing, I will load the librries and load the data:
 
 ``` r
 library(dplyr)
-```
-
-    FALSE 
-    FALSE Attaching package: 'dplyr'
-
-    FALSE The following objects are masked from 'package:stats':
-    FALSE 
-    FALSE     filter, lag
-
-    FALSE The following objects are masked from 'package:base':
-    FALSE 
-    FALSE     intersect, setdiff, setequal, union
-
-``` r
 library(ggplot2)
 library(ggcorrplot)
 library(plyr)
-```
-
-    FALSE -------------------------------------------------------------------------
-
-    FALSE You have loaded plyr after dplyr - this is likely to cause problems.
-    FALSE If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-    FALSE library(plyr); library(dplyr)
-
-    FALSE -------------------------------------------------------------------------
-
-    FALSE 
-    FALSE Attaching package: 'plyr'
-
-    FALSE The following objects are masked from 'package:dplyr':
-    FALSE 
-    FALSE     arrange, count, desc, failwith, id, mutate, rename, summarise,
-    FALSE     summarize
-
-``` r
 library(caret)
-```
-
-    FALSE Loading required package: lattice
-
-``` r
 library(corrplot)
-```
-
-    FALSE corrplot 0.84 loaded
-
-``` r
 library(rattle)
-```
-
-    FALSE Rattle: A free graphical interface for data science with R.
-    FALSE Version 5.2.0 Copyright (c) 2006-2018 Togaware Pty Ltd.
-    FALSE Type 'rattle()' to shake, rattle, and roll your data.
-
-``` r
 set.seed(201902)
 
 training = read.csv("./pml-training.csv")

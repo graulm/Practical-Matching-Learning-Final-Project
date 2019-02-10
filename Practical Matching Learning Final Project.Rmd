@@ -26,7 +26,7 @@ Training data: <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training
 Test data: <https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv>  
    
 Follwoing, I will load the librries and load the data:     
-```{r load_data, warning=FALSE, comment=FALSE, cache=TRUE}
+```{r load_data, warnings=FALSE, comment=FALSE, cache=TRUE}
 library(dplyr)
 library(ggplot2)
 library(ggcorrplot)
