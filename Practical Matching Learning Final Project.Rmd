@@ -3,8 +3,8 @@ title: "Practical Matching Learning Final Project"
 author: "R. Martinez"
 date: "February 9, 2019"
 output:
-  pdf_document: default
-  html_document: default
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r setup, include=FALSE}
